@@ -1,0 +1,22 @@
+#box1{
+   border: 4px solid;
+   width: 250px;
+   height: 250px;
+   font-size: 225px;
+   text-align: center;
+   background: lightskyblue;
+
+   transform: stranslateX(50px);
+   transform: stranslateY(50px);
+   transform: stranslate(50px, 50px);
+   transform: rotateX(180deg);
+   transform: rotateY(180deg);
+   transform: rotate(180deg, 180deg);
+   transform: scaleX(3);
+   transform: scaleY(3);
+   transform: scale(2, 2);
+   transform: skewX(45deg);
+   transform: skewY(45deg);
+   transform: skew(20deg, 20deg);
+
+}

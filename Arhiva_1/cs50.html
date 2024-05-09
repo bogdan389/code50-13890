@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+        <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css" integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+        <script src="https://kit.fontawesome.com/4c6d6e74d7.js"></script>
+        <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js" integrity="sha384-q8i/X+965DzO0rT7abK41JStQIAqVgRVzpbzo5smXKp4YfRvH+8abtTE1Pi6jizo" crossorigin="anonymous"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.14.7/umd/popper.min.js" integrity="sha384-UO2eT0CpHqdSJQ6hJty5KVphtPhzWj9WO1clHTMGa3JDZwrnQq4sF86dIHNDz0W1" crossorigin="anonymous"></script>
+        <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js" integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
+
+
+    <script>
+        window.addEventListener('message', async (e) => {
+            if (e.data === 'reload') {
+                window.location.reload();
+            }
+            else if (e.data === 'restart') {
+                const response = await fetch('/api/projects/' + "42d0185ebfe543f48f4723663a83a75a" + '/restart');
+                if (response.status === 200) {
+                    setTimeout(() => window.location.reload(), 5000);
+                }
+                else {
+                    console.error(`failed to restart ${response.status}`);
+                }
+            }
+            else if (e.data === 'members') {
+                window.open('/projects/' + "42d0185ebfe543f48f4723663a83a75a" + '/members', '_blank');
+            }
+        });
+    </script>
+
+
+        <link crossorigin="anonymous" href="https://use.fontawesome.com/releases/v5.7.2/css/all.css" integrity="sha384-fnmOCqbTlWIlj8LyTjo7mOUStjsKC4pOpQbqyi7RrhN7udi9RwhKkMHpvLbHG9Sr" rel="stylesheet">
+
+        <title>CS50 IDE</title>
+
+        <style>
+            h1 a, h1 a:hover {
+                color: inherit;
+            }
+
+            a:hover {
+                text-decoration: none;
+            }
+
+            p {
+                font-size: 1.25rem;
+            }
+        </style>
+
+
+<style>
+    /* https://github.com/twbs/bootstrap/issues/30493#issuecomment-723199215 */
+    @keyframes spinner-grow {
+        0% {
+            -webkit-transform: scale(0);
+            transform: scale(0);
+        }
+
+        25% {
+            opacity: 0.25;
+            -webkit-transform: scale(0.25);
+            transform: scale(0.25);
+        }
+
+        50% {
+            opacity: 0.75;
+            -webkit-transform: scale(0.50);
+            transform: scale(0.50);
+        }
+    }
+</style>
+
+    </head>
+
+    <body>
+        <div class="container py-5">
+            <h1><a href="/">CS50 IDE</a></h1>
+            <p>integrated development environment for students and teachers</p>
+            <div class="alert alert-danger" role="alert">
+                CS50 IDE is no longer supported. Please stop using CS50 IDE and use <a href="https://cs50.dev/">Visual Studio Code for CS50</a> instead.
+            </div>
+
+
+
+
+
+<hr>
+<div class="spinner text-center mt-5">
+    <div class="spinner-grow text-warning" style="width: 3rem; height: 3rem;" role="status">
+      <span class="sr-only">Loading...</span>
+    </div>
+    <p>Preparing your IDE</p>
+</div>
+<div class="alert alert-danger d-none" role="alert"></div>
+
+<script>
+    const errorAlert = document.querySelector('.alert-danger');
+    const spinner = document.querySelector('.spinner');
+
+    const ideUrl = "https://ide-42d0185ebfe543f48f4723663a83a75a.ide.cs50.io/__login?jwt=eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX3V1aWQiOiI3YTljOTM0ZTk3YTA0YjYzOTliZDc2Y2JiOTFiNzdhOCIsInByb2plY3RfdXVpZCI6IjQyZDAxODVlYmZlNTQzZjQ4ZjQ3MjM2NjNhODNhNzVhIiwiZXhwIjoxNzA3NzY2ODg5fQ.zLP1OLIIwwXeCxEgPWP3VAlxpfhTTJAKlPr9bw63xxI\u0026redirect_uri=https%3A%2F%2Fide-42d0185ebfe543f48f4723663a83a75a.ide.cs50.io";
+
+    function sleep(ms) {
+        return new Promise((resolve) => setTimeout(resolve, ms));
+    }
+
+    function showError(html) {
+        errorAlert.innerHTML = html;
+        spinner.classList.add('d-none');
+        errorAlert.classList.remove('d-none');
+    }
+
+    async function waitUntilIDEReady(ideUrl) {
+        const maxRetries = 8;
+        for (let i = 0; i < maxRetries; i++) {
+            const response = await fetch(ideUrl, {
+                credentials: 'include',
+                redirect: 'follow'
+            });
+
+            if (response.status === 200) {
+                return;
+            }
+            else if (response.status === 403) {
+                return Promise.reject(`Access denied to IDE ${window.location.pathname.replace(/^\//, '')}`);
+            }
+
+            if (i >= maxRetries) {
+                break;
+            }
+            else {
+                await sleep(Math.pow(2, i) * 1000);
+            }
+        }
+
+        return Promise.reject(`Unable to load IDE ${window.location.pathname.replace(/^\//, '')}`);
+    }
+
+    waitUntilIDEReady(ideUrl).then(() => {
+        document.body.style.margin = '0'
+        document.body.style.display= 'flex'
+        const iframe = document.createElement('iframe');
+        iframe.setAttribute('frameBorder', 0);
+        iframe.style.flex = 1
+
+        // Remove iframe from page flow
+        // Otherwise window.innerHeight is 0 for Cloud9's console height
+        iframe.style.visibility = 'hidden';
+        iframe.style.position = 'absolute';
+        iframe.style.left = 0;
+        iframe.style.top = 0;
+        iframe.style.height = '100%';
+        iframe.style.width = '100%';
+        iframe.onload = () => {
+            const container = document.querySelector('.container');
+            if (container) {
+                container.remove();
+            }
+
+            iframe.style.visibility = 'initial';
+        };
+
+        document.body.appendChild(iframe);
+        iframe.setAttribute('src', ideUrl);
+    })
+    .catch(showError);
+</script>
+
+
+        </div>
+
+        <!-- Statuspage widget -->
+        <script src="https://g9mp5m2251ps.statuspage.io/embed/script.js"></script>
+    </body>
+</html>
